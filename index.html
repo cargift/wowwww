@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <!-- For uu Ganti dengan judul yang kamu mau -->
+    <title>For uu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Chewy', cursive !important;
+        }
+
+        body {
+            background-image: url('https://raw.githubusercontent.com/cargift/image/main/2e363cbf605420f0ff3c758c080fa75d.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        :root {
+            --col1: #E5FOFA;
+            --col2: #D1E8FC;
+            --col3: #BDEOFE;
+            --col4: #A2D2FF;
+            --col5: #8FC9FF;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .page {
+            background: rgba(209, 232, 252, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 60px 60px 40px 40px;
+            padding: 32px 20px;
+            border: 6px solid var(--col4);
+            box-shadow: 0 20px 30px rgba(0, 30, 70, 0.4);
+            text-align: center;
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #0a2f4a;
+            margin-bottom: 12px;
+            text-shadow: 3px 3px 0 white;
+            font-weight: normal;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: #1a3f5a;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        p {
+            font-size: 1.6rem;
+            color: #113e5a;
+            margin: 20px 0;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: var(--col4);
+            border: 4px solid white;
+            padding: 14px 30px;
+            font-size: 1.8rem;
+            border-radius: 50px;
+            color: #0a2a44;
+            box-shadow: 0 8px 0 var(--col2);
+            cursor: pointer;
+            margin: 20px 8px 8px;
+            display: inline-block;
+            min-width: 160px;
+            transition: 0.08s linear;
+            letter-spacing: 0.5px;
+            font-weight: normal;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 var(--col2);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            transform: none;
+            box-shadow: 0 8px 0 var(--col2);
+            pointer-events: none;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 300px;
+            margin: 25px auto;
+        }
+
+        .cell {
+            background: white;
+            border: 5px solid var(--col5);
+            border-radius: 40px;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            color: #e8435e;
+            box-shadow: 0 7px 0 var(--col3);
+            cursor: pointer;
+        }
+
+        .cell.filled {
+            pointer-events: none;
+            background: #e8f0ff;
+        }
+
+        .win-message {
+            font-size: 2rem;
+            background: var(--col1);
+            padding: 12px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            border: 4px solid white;
+            margin: 15px 0;
+            color: #103a55;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid var(--col3);
+            box-shadow: 0 15px 0 var(--col2);
+            background: white;
+            display: block;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 40px solid #e65a7c;
+            filter: drop-shadow(0 6px 3px rgba(0,0,0,0.2));
+            z-index: 10;
+        }
+
+        .wheel-title {
+            font-size: 2rem;
+            background: var(--col2);
+            padding: 8px 25px;
+            border-radius: 40px;
+            border: 4px solid white;
+            margin-bottom: 15px;
+            color: #0f3c5c;
+        }
+
+        .spin-result {
+            font-size: 2.2rem;
+            background: var(--col2);
+            padding: 8px 30px;
+            border-radius: 40px;
+            border: 4px solid white;
+            margin: 20px 0 10px;
+            display: inline-block;
+            color: #093b58;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .photo-item {
+            background: white;
+            border-radius: 40px;
+            border: 6px solid var(--col4);
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            box-shadow: 0 8px 0 var(--col2);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* TYPEWRITER LOVE LETTER STYLES */
+        .letter-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50px;
+            padding: 35px 25px;
+            border: 6px solid var(--col3);
+            margin: 20px 0;
+            min-height: 350px;
+            text-align: left;
+            box-shadow: 0 10px 0 var(--col2);
+            position: relative;
+        }
+
+        .typewriter-text {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            color: #15475f;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 300px;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.8rem;
+            background-color: #15475f;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .small-note {
+            background: var(--col1);
+            border-radius: 40px;
+            padding: 12px;
+            font-size: 1.4rem;
+            border: 3px solid white;
+        }
+
+        /* Spotify container */
+        .spotify-container {
+            margin: 20px 0 15px;
+            border-radius: 40px;
+            overflow: hidden;
+            border: 6px solid var(--col3);
+            box-shadow: 0 10px 0 var(--col2);
+            background: white;
+            height: 500px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        #page6 {
+            padding: 25px 18px 30px;
+        }
+
+        @media (max-width: 450px) {
+            .spotify-container {
+                height: 480px;
+            }
+            .typewriter-text {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .page { padding: 25px 15px; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .btn { font-size: 1.6rem; padding: 12px 20px; min-width: 140px; }
+            .cell { font-size: 3.8rem; }
+            .wheel-wrapper { width: 260px; height: 260px; }
+            .spotify-container {
+                height: 450px;
+            }
+            .typewriter-text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div id="page1" class="page active">
+        <!-- Mitta Ganti dengan nama temanmu -->
+        <h1 id="greeting">Hi, Mitta</h1>
+        <p>i have something for you,<br>ready for that?</p>
+        <button class="btn" id="next1">next</button>
+    </div>
+
+    <div id="page2" class="page">
+        <h2>finish the game before you open the surprise</h2>
+        <div class="game-board" id="gameBoard"></div>
+        <div id="winMessage" class="win-message" style="display: none;">♡ YOU WIN ♡</div>
+        <button class="btn" id="next2" disabled>next</button>
+    </div>
+
+    <div id="page3" class="page">
+        <div class="wheel-title">who's your #1 fan?</div>
+        <div class="wheel-wrapper">
+            <div class="pointer"></div>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        </div>
+        <div id="spinResult" class="spin-result">-</div>
+        <button class="btn" id="spinButton">spin</button>
+        <button class="btn" id="next3" disabled>next</button>
+    </div>
+
+    <!-- PAGE 4: Love letter with TYPEWRITER animation -->
+    <div id="page4" class="page">
+        <h2>a little note</h2>
+        <div class="letter-box">
+            <div id="typewriterContainer" class="typewriter-text"></div>
+        </div>
+        <button class="btn" id="next4" disabled>next</button>
+    </div>
+
+    <div id="page5" class="page">
+        <h2>our memories</h2>
+        <div class="photo-grid">
+            <!-- images/photo_8498286668_1774675938.jpg images/photo_8498286668_1774675943.jpg images/photo_8498286668_1774675944.jpg images/photo_8498286668_1774675947.jpg Ganti dengan foto kenangan -->
+            <div class="photo-item"><img src="images/photo_8498286668_1774675938.jpg" alt="memory 1" onerror="this.src='https://via.placeholder.com/200?text=Photo+1'"></div>
+            <div class="photo-item"><img src="images/photo_8498286668_1774675943.jpg" alt="memory 2" onerror="this.src='https://via.placeholder.com/200?text=Photo+2'"></div>
+            <div class="photo-item"><img src="images/photo_8498286668_1774675944.jpg" alt="memory 3" onerror="this.src='https://via.placeholder.com/200?text=Photo+3'"></div>
+            <div class="photo-item"><img src="images/photo_8498286668_1774675947.jpg" alt="memory 4" onerror="this.src='https://via.placeholder.com/200?text=Photo+4'"></div>
+        </div>
+        <p class="small-note">thanks for coming into my life</p>
+        <button class="btn" id="next5">next</button>
+    </div>
+
+    <div id="page6" class="page">
+        <h2>a playlist for you</h2>
+        <div class="spotify-container">
+          <iframe src="https://open.spotify.com/embed/track/5y2ijHECwFYWqcAHKTZgzD" width="100%" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+        <p class="small-note">songs that remind me of you</p>
+        <button class="btn" id="restartBtn">start over</button>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        // --- SEMUA PLACEHOLDER ADA DI SINI ---
+        
+        // Mitta Ganti dengan nama temanmu
+        const FRIEND_NAME = "Mitta";
+        
+        // semangat Ganti dengan isi surat cinta (bisa pakai \n untuk baris baru)
+        const FULL_LETTER = `semangat`;
+        
+        // images/photo_8498286668_1774675937.jpg Ganti dengan URL foto untuk wheel (hanya 1 foto yang di-placeholder)
+        const WHEEL_PHOTO1 = "images/photo_8498286668_1774675937.jpg";
+        
+        // 4 foto memories
+        const MEMORY_PHOTOS = [
+            "images/photo_8498286668_1774675938.jpg",
+            "images/photo_8498286668_1774675943.jpg", 
+            "images/photo_8498286668_1774675944.jpg",
+            "images/photo_8498286668_1774675947.jpg"
+        ];
+        
+        const pages = document.querySelectorAll('.page');
+        let currentPage = 0;
+
+        function goToPage(index) {
+            pages.forEach(p => p.classList.remove('active'));
+            pages[index].classList.add('active');
+            currentPage = index;
+            
+            // Start typewriter animation when entering page 4
+            if (index === 3) { // page4 is index 3
+                startTypewriter();
+            }
+        }
+
+        document.getElementById('next1').addEventListener('click', () => goToPage(1));
+
+        // TIC TAC TOE
+        const boardEl = document.getElementById('gameBoard');
+        const next2 = document.getElementById('next2');
+        const winMsg = document.getElementById('winMessage');
+        let board = ['♡', '♡', '', 'X', '', 'X', '', 'X', ''];
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            board.forEach((val, idx) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell' + (val !== '' ? ' filled' : '');
+                cell.textContent = val;
+                cell.dataset.index = idx;
+                if (val === '') {
+                    cell.addEventListener('click', cellClickHandler);
+                }
+                boardEl.appendChild(cell);
+            });
+        }
+
+        function cellClickHandler(e) {
+            const index = e.target.dataset.index;
+            if (board[index] !== '') return;
+            board[index] = '♡';
+            renderBoard();
+            if (board[0] === '♡' && board[1] === '♡' && board[2] === '♡') {
+                winMsg.style.display = 'inline-block';
+                next2.disabled = false;
+            } else {
+                next2.disabled = true;
+                winMsg.style.display = 'none';
+            }
+        }
+        renderBoard();
+        next2.addEventListener('click', () => goToPage(2));
+
+        // WHEEL LOGIC
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinButton');
+        const next3 = document.getElementById('next3');
+        const spinResult = document.getElementById('spinResult');
+
+        // 5 foto wheel: 1 placeholder + 4 tetap
+        const profileImages = [
+            WHEEL_PHOTO1,  // images/photo_8498286668_1774675937.jpg (placeholder)
+            'https://raw.githubusercontent.com/cargift/image/main/56a34ef7e1163963c03b39d659da9f27.jpg',
+            'https://raw.githubusercontent.com/cargift/image/main/56a34ef7e1163963c03b39d659da9f27.jpg',
+            'https://raw.githubusercontent.com/cargift/image/main/7cbea566fa25838b9cc050c644937bd0.jpg',
+            'https://raw.githubusercontent.com/cargift/image/main/bd462480fa8ce00564ec9e2ad3bc286e.jpg'
+        ];
+        
+        const pieces = profileImages.length;
+        const anglePerPiece = (Math.PI * 2) / pieces;
+        const loadedImages = [];
+        let imagesLoaded = 0;
+
+        function preloadImages(callback) {
+            profileImages.forEach((src, i) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = src;
+                img.onload = () => {
+                    loadedImages[i] = img;
+                    imagesLoaded++;
+                    if (imagesLoaded === pieces) callback();
+                };
+                img.onerror = () => {
+                    // Fallback kalo gambar gagal dimuat
+                    const fallback = document.createElement('canvas');
+                    fallback.width = 80; 
+                    fallback.height = 80;
+                    const ctx = fallback.getContext('2d');
+                    ctx.fillStyle = '#A2D2FF';
+                    ctx.fillRect(0, 0, 80, 80);
+                    ctx.fillStyle = '#0a2f4a';
+                    ctx.font = 'bold 30px Chewy';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText((i+1).toString(), 40, 40);
+                    loadedImages[i] = fallback;
+                    imagesLoaded++;
+                    if (imagesLoaded === pieces) callback();
+                };
+            });
+        }
+
+        let currentRotation = 0;
+
+        function drawWheel(rotateRad) {
+            ctx.clearRect(0, 0, 400, 400);
+            for (let i = 0; i < pieces; i++) {
+                const start = i * anglePerPiece + rotateRad;
+                const end = start + anglePerPiece;
+                ctx.fillStyle = i % 2 === 0 ? '#D1E8FC' : '#A2D2FF';
+                ctx.beginPath();
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 190, start, end);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                if (loadedImages[i]) {
+                    ctx.save();
+                    ctx.translate(200, 200);
+                    ctx.rotate(start + anglePerPiece / 2);
+                    ctx.translate(110, 0);
+                    ctx.rotate(Math.PI/2);
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 40, 0, 2 * Math.PI);
+                    ctx.clip();
+                    ctx.drawImage(loadedImages[i], -40, -40, 80, 80);
+                    ctx.restore();
+                }
+            }
+            ctx.beginPath();
+            ctx.arc(200, 200, 50, 0, 2 * Math.PI);
+            ctx.fillStyle = '#8FC9FF';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+        }
+
+        function setInitialPosition() {
+            currentRotation = -Math.PI/2 - anglePerPiece/2;
+            drawWheel(currentRotation);
+        }
+
+        function spinWheel() {
+            spinBtn.disabled = true;
+            next3.disabled = true;
+            spinResult.textContent = 'spinning...';
+
+            const rotations = 5;
+            const targetRotation = (Math.PI * 2 * rotations) - (Math.PI/2 + anglePerPiece/2);
+            
+            const duration = 4000;
+            const start = performance.now();
+            const initialRotation = currentRotation % (Math.PI * 2);
+
+            function animate(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                
+                currentRotation = initialRotation + (targetRotation - initialRotation) * easeOut;
+                drawWheel(currentRotation);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    spinResult.textContent = 'ME!';
+                    next3.disabled = false;
+                    spinBtn.disabled = false;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        preloadImages(() => setInitialPosition());
+        spinBtn.addEventListener('click', spinWheel);
+        next3.addEventListener('click', () => goToPage(3));
+        
+        // TYPEWRITER LOVE LETTER
+        const typewriterContainer = document.getElementById('typewriterContainer');
+        const next4 = document.getElementById('next4');
+
+        let typewriterInterval;
+        let isTyping = false;
+
+        function startTypewriter() {
+            // Clear previous interval if any
+            if (typewriterInterval) {
+                clearInterval(typewriterInterval);
+            }
+            
+            // Reset container
+            typewriterContainer.innerHTML = '';
+            next4.disabled = true;
+            
+            let i = 0;
+            const speed = 50; // typing speed in ms
+            
+            function typeNextChar() {
+                if (i < FULL_LETTER.length) {
+                    typewriterContainer.innerHTML = FULL_LETTER.substring(0, i + 1) + '<span class="typewriter-cursor"></span>';
+                    i++;
+                } else {
+                    // Typing finished, remove cursor and enable next button
+                    typewriterContainer.innerHTML = FULL_LETTER;
+                    clearInterval(typewriterInterval);
+                    next4.disabled = false;
+                    isTyping = false;
+                }
+            }
+            
+            isTyping = true;
+            typewriterInterval = setInterval(typeNextChar, speed);
+        }
+
+        // Update greeting dengan nama dari placeholder
+        document.getElementById('greeting').innerHTML = `Hi, ${FRIEND_NAME}`;
+
+        document.getElementById('next4').addEventListener('click', () => goToPage(4));
+        document.getElementById('next5').addEventListener('click', () => goToPage(5));
+        
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            goToPage(0);
+            board = ['♡', '♡', '', 'X', '', 'X', '', 'X', ''];
+            renderBoard();
+            winMsg.style.display = 'none';
+            next2.disabled = true;
+            setInitialPosition();
+            spinResult.textContent = '-';
+            
+            // Stop typewriter if running
+            if (typewriterInterval) {
+                clearInterval(typewriterInterval);
+            }
+        });
+    })();
+</script>
+</body>
+</html>
